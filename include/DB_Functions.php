@@ -149,8 +149,6 @@ class DB_Functions {
 			
 		}
 		mysqli_close($this->conn);
-		
-		
 	}
 	
 	public function tornarAdm($usuarioUID, $grupoUID){
@@ -229,9 +227,55 @@ class DB_Functions {
             array_push($resposta["rec"], $tmp);
 			}
 			return $resposta;
-		
+		mysqli_close($this->conn);
 	}
 	
+	public function procuraGrupo($grupoUID){
+		
+		/*"SELECT `tbgrupo`.`nome` AS 'nomeGrupo', `tbgrupo`.`qntdPessoa`,`tbgrupo`.`qntdAdm`, `tbgrupo`.`criadoEm`,`tbusuario`.`nome`AS 'nomeUsuario,
+		`tbusuario`.`admin` FROM `tbgrupo` 
+		INNER JOIN `tbusuario` ON `tbgrupo`.`unique_index` = `tbusuario`.`grupoUID`
+		WHERE`tbgrupo`.`unique_index` = '$grupoUID'
+        ORDER BY `tbusuario`.`admin` DESC, `tbusuario`.`nome` ASC"*/
+		
+		$query = "SELECT * FROM tbGrupo WHERE unique_index = '$grupoUID'";
+		
+		$resul = mysqli_query($this->conn, $query);
+	
+		if($resul){
+			
+			$resposta = array();
+			$grupo = array();
+			$resposta["rec"] = array();
+			$resposta["rec"] ["cont"] = 0;
+			
+			$temp = mysqli_fetch_array($resul);
+			
+			$grupo["nome"] = $temp["nome"];
+			$grupo["qntdPessoa"] = $temp["qntdPessoa"];
+			$grupo["qntdAdm"] = $temp["qntdAdm"];
+			$grupo["criadoEm"] = $temp["criadoEm"];
+			
+			$resposta["rec"]["grupo"] = $grupo;
+			
+			$query = "SELECT `tbUsuario`.`nome`, `tbUsuario`.`admin` FROM tbUsuario WHERE grupoUID = '$grupoUID' ORDER BY admin DESC, nome ASC";
+			
+			$result = mysqli_query($this->conn, $query);
+
+			while ($row = mysqli_fetch_array($result)) {
+		
+				$resposta ["rec"] ["cont"] ++;
+				$tmp = array();
+				$tmp["nome"] = $row["nome"];
+				$tmp["admin"] = $row["admin"];
+			
+				array_push($resposta["rec"], $tmp);
+			}
+		}
+		return $resposta;
+		mysqli_close($this->conn);
+		}
+		
 	public function verificaEmail($email) {
         $stmt = $this->conn->prepare("SELECT email from tbUsuario WHERE email = ?");
 

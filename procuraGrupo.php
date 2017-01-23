@@ -5,30 +5,28 @@ $db = new DB_Functions();
 
 $resposta = array("error" => FALSE);
 
-if (isset($_POST['usuarioUID']) && isset($_POST['grupoUID'])) {
+if (isset($_POST['grupoUID'])) {
 
 
-    $usuarioUID = $_POST['usuarioUID'];
     $grupoUID = $_POST['grupoUID'];
 
-    $louca = $db->verLouca($usuarioUID, $grupoUID);
+    $grupo = $db->procuraGrupo($grupoUID);
 
-    if ($louca != false) {
+    if ($grupo != false) {
         
 		$resposta["error"] = FALSE;
-
-		$resposta["resposta"]= $louca;
+		$resposta["resposta"]= $grupo;
 			
         echo json_encode($resposta);
     } else {
         $resposta["error"] = TRUE;
-        $resposta["error_msg"] = "Nenhum registro encontrado";
+        $resposta["error_msg"] = "Nenhum grupo encontrado";
         echo json_encode($resposta);
     }
 } else {
 
     $resposta["error"] = TRUE;
-    $resposta["error_msg"] = "Informação faltando!";
+    $resposta["error_msg"] = "Nenhum número digitado";
     echo json_encode($resposta);
 }
 ?>

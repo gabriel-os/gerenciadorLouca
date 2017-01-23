@@ -54,7 +54,7 @@ if (isset($_POST['nome']) && isset($_POST['sobrenome']) && isset($_POST['email']
     
 } else {
     $resposta["error"] = TRUE;
-    $resposta["error_msg"] = "Verifique os dados preenchidos! (campo(s) vazio(s)";
+    $resposta["error_msg"] = "Verifique os dados preenchidos! (campo(s) vazio(s))";
     echo json_encode($resposta);
 }
 ?>

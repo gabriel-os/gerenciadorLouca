@@ -198,6 +198,30 @@ class DB_Functions {
 		
 	}
 
+	public function expulsar($usuarioUID, $grupoUID){
+		
+		$queryUsuario = "UPDATE tbUsuario set grupoUID = null WHERE unique_index = '$usuarioUID'";
+		$queryGrupo = "UPDATE tbGrupo set qntdPessoa = qntdPessoa-1 WHERE unique_index = '$grupoUID'"; 
+		
+		$resulUsuario = mysqli_query($this->conn, $queryUsuario);
+		
+		if($resulUsuario){
+	
+			$resulGrupo = mysqli_query($this->conn, $queryGrupo);
+			
+			if($resulGrupo){
+
+				$query = "SELECT * FROM tbGrupo WHERE unique_index = '$grupoUID'";
+				$resul = mysqli_query($this->conn, $query);
+				
+				return TRUE;
+			}
+			
+		}
+		mysqli_close($this->conn);
+		
+	}
+	
 	public function verLouca($usuarioUID, $grupoUID){
 		
 		$query = "SELECT `tblavado`.`usuarioUID`, `tblavado`.`dataLavada`, `tblavado`.`diaCerto`, `tblavado`.`id`, `tblavado`.`itens`, `tblavado`.`observacao`, 
@@ -228,6 +252,18 @@ class DB_Functions {
 			}
 			return $resposta;
 		mysqli_close($this->conn);
+	}
+	
+	public function insereLouca($usuarioUID, $grupoUID, $dataLavada, $diaCerto, $itens, $observacao, $observacaoAdm){
+		
+		$query = "INSERT INTO tblavado (usuarioUID, grupoUID, diaCerto, itens, observacao, observacaoAdm) VALUES ('$usuarioUID', '$grupoUID', 
+		'$dataLavada', '$diaCerto', '$itens', '$observacao', '$observacaoAdm')";
+		
+		$resul = mysqli_query($this->conn, $query);
+		
+		if($resul){
+			return TRUE;
+		}
 	}
 	
 	public function procuraGrupo($grupoUID){

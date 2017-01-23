@@ -174,11 +174,65 @@ class DB_Functions {
 			
 		}
 		mysqli_close($this->conn);
+	}
+	
+	public function sairAdm($usuarioUID, $grupoUID){
 		
+		$queryUsuario = "UPDATE tbUsuario set admin = 0 WHERE unique_index = '$usuarioUID'";
+		$queryGrupo = "UPDATE tbGrupo set qntdAdm = qntdAdm-1 WHERE unique_index = '$grupoUID'"; 
+		
+		$resulUsuario = mysqli_query($this->conn, $queryUsuario);
+		
+		if($resulUsuario){
+	
+			$resulGrupo = mysqli_query($this->conn, $queryGrupo);
+			
+			if($resulGrupo){
+
+				$query = "SELECT * FROM tbGrupo WHERE unique_index = '$grupoUID'";
+				$resul = mysqli_query($this->conn, $query);
+				
+				return TRUE;
+			}
+			
+		}
+		mysqli_close($this->conn);
+		
+	}
+
+	public function verLouca($usuarioUID, $grupoUID){
+		
+		$query = "SELECT `tblavado`.`usuarioUID`, `tblavado`.`dataLavada`, `tblavado`.`diaCerto`, `tblavado`.`id`, `tblavado`.`itens`, `tblavado`.`observacao`, 
+		`tblavado`.`observacaoAdm`, `tbusuario`.`nome` FROM `tblavado` 
+		INNER JOIN `tbusuario` ON `tblavado`.`usuarioUID` = `tbusuario`.`unique_index`  
+		WHERE`tblavado`.`usuarioUID` = '$usuarioUID' AND `tblavado`.`grupoUID` = '$grupoUID'";
+		
+		$resul = mysqli_query($this->conn, $query);
+		
+		$resposta = array();
+        $resposta["rec"] = array();
+        $resposta["rec"] ["cont"] = 0;
+        $resul = mysqli_query($this->conn, $query);
+
+        while ($row = mysqli_fetch_array($resul)) {
+		
+            $resposta ["rec"] ["cont"] ++;
+            $tmp = array();
+            $tmp["usuarioUID"] = $row["usuarioUID"];
+            $tmp["dataLavada"] = $row["dataLavada"];
+            $tmp["diaCerto"] = $row["diaCerto"];
+            $tmp["id"] = $row["id"];
+            $tmp["itens"] = $row["itens"];
+            $tmp["observacao"] = $row["observacao"];
+            $tmp["observacaoAdm"] = $row["observacaoAdm"];
+			
+            array_push($resposta["rec"], $tmp);
+			}
+			return $resposta;
 		
 	}
 	
-    public function verificaEmail($email) {
+	public function verificaEmail($email) {
         $stmt = $this->conn->prepare("SELECT email from tbUsuario WHERE email = ?");
 
         $stmt->bind_param("s", $email);
@@ -196,7 +250,7 @@ class DB_Functions {
         }
         mysqli_close($this->conn);
     }
-
+	
     public function changePassword($uid, $newPassword) {
         
         if (empty($uid) || empty($newPassword)) {
